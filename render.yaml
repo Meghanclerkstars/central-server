@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: flir-central-server
+    env: python
+    buildCommand: ""
+    startCommand: "python central_server.py"
+    plan: free

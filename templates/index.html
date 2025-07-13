@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><title>Pi Dashboard</title></head>
+<body>
+    <h1>Connected Raspberry Pis</h1>
+    <ul>
+        {% for pi, info in devices.items() %}
+            <li>
+                <strong>{{ pi }}</strong> - <a href="{{ info.ngrok_url }}" target="_blank">{{ info.ngrok_url }}</a> (Last seen: {{ info.last_seen }})
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
