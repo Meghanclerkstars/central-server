@@ -1,5 +1,5 @@
-from flask import Flask, request, jsonify, render_template_string
-from datetime import datetime, timedelta
+from flask import Flask, request, jsonify, render_template_string, redirect
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -26,15 +26,7 @@ def report():
 
 @app.route("/pis", methods=["GET"])
 def get_pis():
-    now = datetime.now()
-    filtered = {}
-
-    for hostname, info in active_pis.items():
-        last_seen = datetime.strptime(info["last_seen"], "%Y-%m-%d %H:%M:%S")
-        if now - last_seen < timedelta(seconds=30):  # Only keep Pis seen in last 30 seconds
-            filtered[hostname] = info
-
-    return jsonify(filtered)
+    return jsonify(active_pis)
 
 @app.route("/dashboard", methods=["GET"])
 def dashboard():
@@ -112,6 +104,10 @@ def dashboard():
     </html>
     '''
     return render_template_string(html)
+
+@app.route("/")
+def home():
+    return redirect("/dashboard")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
