@@ -1,6 +1,5 @@
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template_string, redirect
 from datetime import datetime
-import os
 
 app = Flask(__name__)
 
@@ -106,7 +105,9 @@ def dashboard():
     '''
     return render_template_string(html)
 
-# Make sure to use this so Render picks the port
+@app.route("/")
+def home():
+    return redirect("/dashboard")
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=8000)
