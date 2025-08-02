@@ -109,5 +109,12 @@ def dashboard():
 def home():
     return redirect("/dashboard")
 
+from flask import send_from_directory
+
+@app.route("/updates/flir_sim_update.zip")
+def serve_update():
+    return send_from_directory("static/updates", "flir_sim_update.zip")
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)

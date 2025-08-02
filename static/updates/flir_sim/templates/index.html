@@ -1,0 +1,225 @@
+<!--
+=========================================================
+* Material Dashboard 3 - v3.2.0
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard
+* Copyright 2024 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static', filename='img/apple-icon.png') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+  <title>
+    Flir Pi Send
+  </title>
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
+  <!-- Nucleo Icons -->
+  <link href="{{ url_for('static', filename='css/nucleo-icons.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='css/nucleo-svg.css') }}" rel="stylesheet" />  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <!-- Material Icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="{{ url_for('static', filename='css/material-dashboard.css') }}" rel="stylesheet" />
+</head>
+
+<body class="g-sidenav-show  bg-gray-100 py-4">
+
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-3 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Pages</a></li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Dashboard</li>
+          </ol>
+        </nav>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container-fluid py-2">
+      <div class="row">
+        <div class="ms-3">
+          <h3 class="mb-0 h4 font-weight-bolder">📂 FLIR Upload Dashboard</h3>
+          <p class="mb-4">
+            Kindly be patient the faster the folder will be uploaded the faster you internet is!!
+          </p>
+        </div>
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+          <div class="card">
+            <div class="card-header p-2 ps-3">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h5 class="mb-2">📊 Status</h5>
+                  <br>
+                  <p id="status-text"><strong>Status:</strong> {{ status.status }}</p>
+                  <br>
+                  <p><strong>Last Folder:</strong> {{ status.folder }}</p>
+                  <br>
+                  <p><strong>Time:</strong> {{ status.timestamp }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+          <div class="card text-center">
+            <form id="scan-form" method="POST" action="{{ url_for('scan_camera') }}">
+             <button type="submit" class="btn btn-primary mb-4">📸 Scan FLIR Camera</button>
+            </form>
+          </div>
+        </div>
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+          <div class="ms-3">
+            <h2 class="mb-3">📁 Uploaded Folders</h2>
+          </div>
+        </div>
+        <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+           {% if folders %}
+           {% for folder in folders %}
+            <div class="card">
+              <div class="card-header p-2 ps-3">
+                <div class="card-body">
+                      <h5 class="card-title">{{ folder }}</h5>
+                    <div class="row"> 
+                     <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+                       <a href="{{ url_for('folder_notes', folder=folder) }}" class="btn btn-sm btn-secondary">📝 Notes</a>
+                     </div>
+                       <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+                       <a href="{{ url_for('rename_folder', folder=folder) }}" class="btn btn-sm btn-warning">✏️ Rename Folder</a>
+                       </div>
+                       <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+                        <form method="POST" action="{{ url_for('upload_folder_api', folder=folder) }}" class="d-inline" onsubmit="startUpload(event, '{{ folder }}')">
+                            <button type="submit" class="btn btn-sm btn-success">☁️ Upload</button>
+                        </form>
+                       </div>
+                      </div>  
+                       <div class="progress-bar-container" id="progress-container-{{ folder }}">
+                           <div class="progress mt-2">
+                               <div class="progress-bar" id="progress-fill-{{ folder }}" style="width: 0%">0%</div>
+                           </div>
+                           <p id="progress-text-{{ folder }}" class="mt-1 small text-muted"></p>
+                       </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="col-xl-12 col-sm-12 mb-xl-0 mb-4">
+          <div class="ms-3">
+            {% endfor %}
+                 {% else %}
+              <p>No uploaded folders found.</p>
+             {% endif %}
+          </div>
+      </div>
+    </div>
+    </div>
+  </main>
+  <!--   Core JS Files   -->
+  <script src="{{ url_for('static', filename='js/core/popper.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/core/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/plugins/perfect-scrollbar.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/plugins/smooth-scrollbar.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/plugins/chartjs.min.js') }}"></script>
+
+      <script>
+        function startUpload(event, folder) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const progressBarContainer = document.getElementById(`progress-container-${folder}`);
+            const progressFill = document.getElementById(`progress-fill-${folder}`);
+            const progressText = document.getElementById(`progress-text-${folder}`);
+            const statusText = document.getElementById("status-text");
+
+            progressBarContainer.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressFill.innerText = '0%';
+            progressText.innerText = 'Preparing upload...';
+
+            fetch(`/upload_api/${folder}`, { method: 'POST' });
+
+            const poll = setInterval(() => {
+                fetch("/")
+                    .then(res => res.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, "text/html");
+                        const status = doc.querySelector("#status-text").textContent;
+                        const sizeMatch = status.match(/\((\d+\.?\d*)MB\)\s*\/\s*(\d+\.?\d*)MB/);
+                        const percentMatch = status.match(/(\d+)%/);
+
+                        if (sizeMatch && percentMatch) {
+                            const uploaded = parseFloat(sizeMatch[1]);
+                            const total = parseFloat(sizeMatch[2]);
+                            const percent = parseInt(percentMatch[1]);
+                            progressFill.style.width = percent + '%';
+                            progressFill.innerText = `${percent}%`;
+                            progressText.innerText = `${uploaded}MB / ${total}MB`;
+                        }
+
+                        if (status.includes("Uploaded") || status.includes("Failed") || status.includes("Done")) {
+                            clearInterval(poll);
+                            progressFill.style.width = '100%';
+                            progressFill.innerText = '✅ Done';
+                            setTimeout(() => location.reload(), 1500);
+                        }
+                    });
+            }, 1000);
+        }
+    </script>
+
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+  <!-- Github buttons -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="{{ url_for('static', filename='static/js/material-dashboard.min.js?v=3.2.0') }}"></script>
+<script>
+let wakeLock = null;
+
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      console.log("? Wake lock is active");
+    }
+  } catch (err) {
+    console.error(`? Wake Lock error: ${err.name}, ${err.message}`);
+  }
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (wakeLock !== null && document.visibilityState === "visible") {
+    requestWakeLock();
+  }
+});
+
+// Automatically request when page loads
+requestWakeLock();
+</script>
+
+</body>
+
+</html>
